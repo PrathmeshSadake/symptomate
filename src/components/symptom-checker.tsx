@@ -315,13 +315,7 @@ export default function SymptomChecker() {
                   className='flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary'
                 >
                   <RadioGroupItem value='self' id='self' className='sr-only' />
-                  <Image
-                    src='/placeholder.svg?height=50&width=50'
-                    alt='Self'
-                    className='mb-3'
-                    width={50}
-                    height={50}
-                  />
+
                   <div className='text-center'>
                     <p className='font-medium'>Myself</p>
                     <p className='text-sm text-muted-foreground'>
@@ -338,13 +332,7 @@ export default function SymptomChecker() {
                     id='other'
                     className='sr-only'
                   />
-                  <Image
-                    src='/placeholder.svg?height=50&width=50'
-                    alt='Someone else'
-                    className='mb-3'
-                    width={50}
-                    height={50}
-                  />
+
                   <div className='text-center'>
                     <p className='font-medium'>Someone else</p>
                     <p className='text-sm text-muted-foreground'>
