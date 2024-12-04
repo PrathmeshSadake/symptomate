@@ -3,10 +3,6 @@
 import { createContext, useContext, useReducer, ReactNode } from "react";
 import { FormState, FormStep, UserType } from "@/types/form";
 
-interface SymptomDetails {
-  [key: string]: any;
-}
-
 type FormAction =
   | { type: "NEXT_STEP" }
   | { type: "PREV_STEP" }
@@ -45,7 +41,7 @@ const initialState: FormState = {
     hypertension: null,
   },
   symptoms: [],
-  // symptomDetails: {},
+
   careType: null,
   specialist: null,
 };
@@ -65,7 +61,7 @@ const formReducer = (state: any, action: FormAction): FormState => {
         "userDetails",
         "patient",
         "symptoms",
-        "symptomDetails",
+
         "care",
         "results",
       ];
@@ -82,7 +78,7 @@ const formReducer = (state: any, action: FormAction): FormState => {
         "userDetails",
         "patient",
         "symptoms",
-        "symptomDetails",
+
         "care",
         "results",
       ];
@@ -139,14 +135,7 @@ const formReducer = (state: any, action: FormAction): FormState => {
           (symptom: any) => symptom !== action.payload
         ),
       };
-    case "SET_SYMPTOM_DETAILS":
-      return {
-        ...state,
-        symptomDetails: {
-          ...state.symptomDetails,
-          ...action.payload,
-        },
-      };
+
     case "SET_CARE_TYPE":
       return {
         ...state,

@@ -5,7 +5,6 @@ export type FormStep =
   | "userDetails"
   | "patient"
   | "symptoms"
-  | "symptomDetails"
   | "care"
   | "results";
 

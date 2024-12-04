@@ -13,7 +13,6 @@ import {
   specialistAtom,
   resultsAtom,
   predefinedSymptomsAtom,
-  symptomDetailsAtom,
   predefinedSpecialistsAtom,
 } from "@/atoms/symptom-checker";
 import { Button } from "@/components/ui/button";
@@ -61,7 +60,6 @@ export default function SymptomChecker() {
   const [results, setResults] = useAtom(resultsAtom);
   const [predefinedSymptoms] = useAtom(predefinedSymptomsAtom);
   const [predefinedSpecialists] = useAtom(predefinedSpecialistsAtom);
-  const [symptomDetails, setSymptomDetails] = useAtom(symptomDetailsAtom);
 
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -80,7 +78,7 @@ export default function SymptomChecker() {
           patientType,
           medicalHistory,
           symptoms,
-          symptomDetails,
+
           careType,
           specialist,
         }),
@@ -461,11 +459,6 @@ export default function SymptomChecker() {
                     size='sm'
                     onClick={() => {
                       setSymptoms(symptoms.filter((s) => s !== symptom));
-                      setSymptomDetails((prevDetails: any) => {
-                        const newDetails = { ...prevDetails };
-                        delete newDetails[symptom.toLowerCase() as keyof any];
-                        return newDetails;
-                      });
                     }}
                     className='flex items-center gap-1 bg-blue-100 text-blue-800 hover:bg-blue-200'
                   >
@@ -479,166 +472,6 @@ export default function SymptomChecker() {
               <p className='text-sm text-gray-500'>
                 Please add at least one symptom.
               </p>
-            )}
-          </div>
-        );
-
-      case "symptomDetails":
-        return (
-          <div className='space-y-6'>
-            <h2 className='text-3xl font-bold text-blue-600'>
-              Additional Symptom Information
-            </h2>
-            {symptoms.includes("Headache") && (
-              <div className='space-y-4 bg-blue-50 p-6 rounded-lg'>
-                <h3 className='text-2xl font-semibold text-blue-800'>
-                  Headache Details
-                </h3>
-                <div className='space-y-2'>
-                  <h4 className='text-lg font-medium text-gray-700'>
-                    Duration
-                  </h4>
-                  <RadioGroup
-                    value={symptomDetails.headache?.duration || ""}
-                    onValueChange={(value) =>
-                      setSymptomDetails((prevDetails: any) => ({
-                        ...prevDetails,
-                        headache: {
-                          ...prevDetails.headache,
-                          duration: value,
-                        },
-                      }))
-                    }
-                  >
-                    {["new", "recurring", "chronic"].map((option) => (
-                      <div key={option} className='flex items-center space-x-2'>
-                        <RadioGroupItem
-                          value={option}
-                          id={`headache-duration-${option}`}
-                        />
-                        <Label
-                          htmlFor={`headache-duration-${option}`}
-                          className='text-gray-700'
-                        >
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-                <div className='space-y-2'>
-                  <h4 className='text-lg font-medium text-gray-700'>
-                    Intensity
-                  </h4>
-                  <RadioGroup
-                    value={symptomDetails.headache?.intensity || ""}
-                    onValueChange={(value) =>
-                      setSymptomDetails((prevDetails: any) => ({
-                        ...prevDetails,
-                        headache: {
-                          ...prevDetails.headache,
-                          intensity: value,
-                        },
-                      }))
-                    }
-                  >
-                    {["mild", "moderate", "severe"].map((option) => (
-                      <div key={option} className='flex items-center space-x-2'>
-                        <RadioGroupItem
-                          value={option}
-                          id={`headache-intensity-${option}`}
-                        />
-                        <Label
-                          htmlFor={`headache-intensity-${option}`}
-                          className='text-gray-700'
-                        >
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-              </div>
-            )}
-            {symptoms.includes("Fever") && (
-              <div className='space-y-4 bg-blue-50 p-6 rounded-lg'>
-                <h3 className='text-2xl font-semibold text-blue-800'>
-                  Fever Details
-                </h3>
-                <div className='space-y-2'>
-                  <h4 className='text-lg font-medium text-gray-700'>
-                    Temperature
-                  </h4>
-                  <RadioGroup
-                    value={symptomDetails.fever?.temperature || ""}
-                    onValueChange={(value) =>
-                      setSymptomDetails((prevDetails: any) => ({
-                        ...prevDetails,
-                        fever: {
-                          ...prevDetails.fever,
-                          temperature: value,
-                        },
-                      }))
-                    }
-                  >
-                    {["low", "moderate", "high"].map((option) => (
-                      <div key={option} className='flex items-center space-x-2'>
-                        <RadioGroupItem
-                          value={option}
-                          id={`fever-temperature-${option}`}
-                        />
-                        <Label
-                          htmlFor={`fever-temperature-${option}`}
-                          className='text-gray-700'
-                        >
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-                <div className='space-y-2'>
-                  <h4 className='text-lg font-medium text-gray-700'>
-                    Additional Symptoms
-                  </h4>
-                  <div className='flex items-center space-x-2'>
-                    <Checkbox
-                      id='runny-nose'
-                      checked={symptomDetails.fever?.runnyNose || false}
-                      onCheckedChange={(checked) =>
-                        setSymptomDetails((prevDetails: any) => ({
-                          ...prevDetails,
-                          fever: {
-                            ...prevDetails.fever,
-                            runnyNose: checked,
-                          },
-                        }))
-                      }
-                    />
-                    <Label htmlFor='runny-nose' className='text-gray-700'>
-                      Runny Nose
-                    </Label>
-                  </div>
-                  <div className='flex items-center space-x-2'>
-                    <Checkbox
-                      id='sore-throat'
-                      checked={symptomDetails.fever?.soreThroat || false}
-                      onCheckedChange={(checked) =>
-                        setSymptomDetails((prevDetails: any) => ({
-                          ...prevDetails,
-                          fever: {
-                            ...prevDetails.fever,
-                            soreThroat: checked,
-                          },
-                        }))
-                      }
-                    />
-                    <Label htmlFor='sore-throat' className='text-gray-700'>
-                      Sore Throat
-                    </Label>
-                  </div>
-                </div>
-              </div>
             )}
           </div>
         );
@@ -742,8 +575,6 @@ export default function SymptomChecker() {
         return userType === "individual" ? patientType !== null : true;
       case "symptoms":
         return symptoms.length > 0;
-      case "symptomDetails":
-        return true;
       case "care":
         return careType !== null;
       default:
@@ -759,7 +590,7 @@ export default function SymptomChecker() {
       "userDetails",
       "patient",
       "symptoms",
-      "symptomDetails",
+
       "care",
       "results",
     ];
@@ -767,8 +598,6 @@ export default function SymptomChecker() {
 
     if (step === "userDetails" && userType !== "individual") {
       setStep("symptoms");
-    } else if (step === "symptoms" && symptoms.length > 0) {
-      setStep("symptomDetails");
     } else if (step === "care") {
       handleSubmit();
     } else {
@@ -784,7 +613,7 @@ export default function SymptomChecker() {
       "userDetails",
       "patient",
       "symptoms",
-      "symptomDetails",
+
       "care",
       "results",
     ];

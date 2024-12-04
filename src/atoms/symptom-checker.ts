@@ -22,7 +22,6 @@ export const symptomsAtom = atom<string[]>([]);
 export const careTypeAtom = atom<string | null>(null);
 export const specialistAtom = atom<string | null>(null);
 export const resultsAtom = atom<SymptomResult | null>(null);
-export const symptomDetailsAtom = atom<any>({});
 
 // Pre-defined set of symptoms
 export const predefinedSymptomsAtom = atom<string[]>([
