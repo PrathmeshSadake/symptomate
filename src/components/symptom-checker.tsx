@@ -17,7 +17,6 @@ import {
   predefinedSpecialistsAtom,
 } from "@/atoms/symptom-checker";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -38,10 +37,16 @@ import {
   RefreshCw,
   Plus,
   X,
+  User,
+  Hospital,
+  Shield,
+  Stethoscope,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { FormStep, UserType } from "@/types/form";
 import { SymptomAnalysisResults } from "./results";
+import Image from "next/image";
 
 export default function SymptomChecker() {
   const [step, setStep] = useAtom(stepAtom);
@@ -100,30 +105,41 @@ export default function SymptomChecker() {
         return (
           <div className='space-y-6'>
             <div className='space-y-2'>
-              <h1 className='text-3xl font-bold'>Check your symptoms</h1>
-              <p className='text-muted-foreground'>
+              <h1 className='text-4xl font-bold text-blue-600'>
+                Check your symptoms
+              </h1>
+              <p className='text-xl text-gray-600'>
                 Take a short symptom assessment. The information you give is
-                safe and won't be shared. Your results will include:
+                safe and won't be shared.
               </p>
-              <ul className='ml-6 list-disc text-muted-foreground'>
-                <li>Possible causes of symptoms</li>
-                <li>Recommendations on what to do next</li>
-              </ul>
             </div>
+            <img
+              src='https://docus-live-cms-storage-us.s3.amazonaws.com/product_guide/images/sections/2c686aa600e22efb9ec91d512cba8660.png'
+              alt='Symptom Checker'
+              className='w-full rounded-lg shadow-md'
+            />
             <div className='space-y-4'>
-              <h2 className='text-xl font-semibold'>About this tool</h2>
-              <div className='space-y-2'>
-                <div className='flex items-center gap-2'>
-                  <ChevronRight className='h-4 w-4' />
-                  <span>Created and validated by doctors</span>
+              <h2 className='text-2xl font-semibold text-blue-600'>
+                About this tool
+              </h2>
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                <div className='flex items-center gap-2 bg-blue-50 p-4 rounded-lg'>
+                  <Stethoscope className='h-8 w-8 text-blue-600' />
+                  <span className='text-gray-800'>
+                    Created and validated by doctors
+                  </span>
                 </div>
-                <div className='flex items-center gap-2'>
-                  <ChevronRight className='h-4 w-4' />
-                  <span>Clinically validated with patient cases</span>
+                <div className='flex items-center gap-2 bg-blue-50 p-4 rounded-lg'>
+                  <User className='h-8 w-8 text-blue-600' />
+                  <span className='text-gray-800'>
+                    Clinically validated with patient cases
+                  </span>
                 </div>
-                <div className='flex items-center gap-2'>
-                  <ChevronRight className='h-4 w-4' />
-                  <span>Class I medical device in the EU</span>
+                <div className='flex items-center gap-2 bg-blue-50 p-4 rounded-lg'>
+                  <Shield className='h-8 w-8 text-blue-600' />
+                  <span className='text-gray-800'>
+                    Class I medical device in the EU
+                  </span>
                 </div>
               </div>
             </div>
@@ -134,16 +150,18 @@ export default function SymptomChecker() {
         return (
           <div className='space-y-6'>
             <div className='space-y-2'>
-              <h2 className='text-2xl font-bold'>Terms of Service</h2>
-              <p className='text-muted-foreground'>
+              <h2 className='text-3xl font-bold text-blue-600'>
+                Terms of Service
+              </h2>
+              <p className='text-lg text-gray-600'>
                 Before using the symptom assessment, please accept the Terms of
                 Service and Privacy Policy.
               </p>
             </div>
             <div className='space-y-4'>
               <div className='space-y-2'>
-                <p className='font-medium'>Please note:</p>
-                <ul className='ml-6 list-disc space-y-2 text-muted-foreground'>
+                <p className='font-medium text-gray-800'>Please note:</p>
+                <ul className='ml-6 list-disc space-y-2 text-gray-600'>
                   <li>
                     The result is not a diagnosis. It's only for your
                     information and not a qualified medical opinion.
@@ -167,7 +185,7 @@ export default function SymptomChecker() {
                       setAcceptedTerms(checked as boolean)
                     }
                   />
-                  <Label htmlFor='terms'>
+                  <Label htmlFor='terms' className='text-gray-800'>
                     I have read and accept the Terms of Service.
                   </Label>
                 </div>
@@ -179,25 +197,32 @@ export default function SymptomChecker() {
       case "userType":
         return (
           <div className='space-y-6'>
-            <h2 className='text-2xl font-bold'>Select User Type</h2>
+            <h2 className='text-3xl font-bold text-blue-600'>
+              Select User Type
+            </h2>
             <RadioGroup
               value={userType || ""}
               onValueChange={(value) => setUserType(value as UserType)}
             >
               <div className='grid gap-4 md:grid-cols-3'>
-                {["individual", "hospital", "insurance"].map((type) => (
+                {[
+                  { type: "individual", icon: User },
+                  { type: "hospital", icon: Hospital },
+                  { type: "insurance", icon: Shield },
+                ].map(({ type, icon: Icon }) => (
                   <Label
                     key={type}
                     htmlFor={type}
-                    className='flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary'
+                    className='flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 border-blue-200 bg-white p-6 hover:bg-blue-50 hover:border-blue-400 transition-all [&:has([data-state=checked])]:border-blue-600 [&:has([data-state=checked])]:bg-blue-50'
                   >
                     <RadioGroupItem
                       value={type}
                       id={type}
                       className='sr-only'
                     />
+                    <Icon className='h-12 w-12 text-blue-600 mb-4' />
                     <div className='text-center'>
-                      <p className='font-medium'>
+                      <p className='font-medium text-lg text-gray-800'>
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </p>
                     </div>
@@ -211,23 +236,28 @@ export default function SymptomChecker() {
       case "userDetails":
         return (
           <div className='space-y-6'>
-            <h2 className='text-2xl font-bold'>User Details</h2>
+            <h2 className='text-3xl font-bold text-blue-600'>User Details</h2>
             {userType === "individual" && (
               <div className='space-y-4'>
-                <Label htmlFor='name'>Name</Label>
+                <Label htmlFor='name' className='text-gray-700'>
+                  Name
+                </Label>
                 <Input
                   id='name'
                   value={userDetails.name}
                   onChange={(e) =>
                     setUserDetails({ ...userDetails, name: e.target.value })
                   }
+                  className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'
                 />
               </div>
             )}
             {userType === "hospital" && (
               <div className='space-y-4'>
                 <div>
-                  <Label htmlFor='hospitalName'>Hospital Name</Label>
+                  <Label htmlFor='hospitalName' className='text-gray-700'>
+                    Hospital Name
+                  </Label>
                   <Input
                     id='hospitalName'
                     value={userDetails.hospitalName}
@@ -237,10 +267,13 @@ export default function SymptomChecker() {
                         hospitalName: e.target.value,
                       })
                     }
+                    className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'
                   />
                 </div>
                 <div>
-                  <Label htmlFor='patientName'>Patient Name</Label>
+                  <Label htmlFor='patientName' className='text-gray-700'>
+                    Patient Name
+                  </Label>
                   <Input
                     id='patientName'
                     value={userDetails.patientName}
@@ -250,15 +283,18 @@ export default function SymptomChecker() {
                         patientName: e.target.value,
                       })
                     }
+                    className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'
                   />
                 </div>
                 <div>
-                  <Label htmlFor='specialist'>Specialist</Label>
+                  <Label htmlFor='specialist' className='text-gray-700'>
+                    Specialist
+                  </Label>
                   <Select
                     value={specialist || ""}
                     onValueChange={setSpecialist}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'>
                       <SelectValue placeholder='Select a specialist' />
                     </SelectTrigger>
                     <SelectContent>
@@ -275,17 +311,22 @@ export default function SymptomChecker() {
             {userType === "insurance" && (
               <div className='space-y-4'>
                 <div>
-                  <Label htmlFor='insuranceName'>Insurance Company Name</Label>
+                  <Label htmlFor='insuranceName' className='text-gray-700'>
+                    Insurance Company Name
+                  </Label>
                   <Input
                     id='insuranceName'
                     value={userDetails.name}
                     onChange={(e) =>
                       setUserDetails({ ...userDetails, name: e.target.value })
                     }
+                    className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'
                   />
                 </div>
                 <div>
-                  <Label htmlFor='patientName'>Patient Name</Label>
+                  <Label htmlFor='patientName' className='text-gray-700'>
+                    Patient Name
+                  </Label>
                   <Input
                     id='patientName'
                     value={userDetails.patientName}
@@ -295,10 +336,13 @@ export default function SymptomChecker() {
                         patientName: e.target.value,
                       })
                     }
+                    className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'
                   />
                 </div>
                 <div>
-                  <Label htmlFor='policyNumber'>Insurance Policy Number</Label>
+                  <Label htmlFor='policyNumber' className='text-gray-700'>
+                    Insurance Policy Number
+                  </Label>
                   <Input
                     id='policyNumber'
                     value={userDetails.insurancePolicyNumber}
@@ -308,6 +352,7 @@ export default function SymptomChecker() {
                         insurancePolicyNumber: e.target.value,
                       })
                     }
+                    className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'
                   />
                 </div>
               </div>
@@ -318,7 +363,9 @@ export default function SymptomChecker() {
       case "patient":
         return userType === "individual" ? (
           <div className='space-y-6'>
-            <h2 className='text-2xl font-bold'>Who is the checkup for?</h2>
+            <h2 className='text-3xl font-bold text-blue-600'>
+              Who is the checkup for?
+            </h2>
             <RadioGroup
               value={patientType || ""}
               onValueChange={(value) =>
@@ -328,32 +375,30 @@ export default function SymptomChecker() {
               <div className='grid gap-4 md:grid-cols-2'>
                 <Label
                   htmlFor='self'
-                  className='flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary'
+                  className='flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 border-blue-200 bg-white p-6 hover:bg-blue-50 hover:border-blue-400 transition-all [&:has([data-state=checked])]:border-blue-600 [&:has([data-state=checked])]:bg-blue-50'
                 >
                   <RadioGroupItem value='self' id='self' className='sr-only' />
-
+                  <User className='h-12 w-12 text-blue-600 mb-4' />
                   <div className='text-center'>
-                    <p className='font-medium'>Myself</p>
-                    <p className='text-sm text-muted-foreground'>
-                      I am 18 or older
-                    </p>
+                    <p className='font-medium text-lg text-gray-800'>Myself</p>
+                    <p className='text-sm text-gray-600'>I am 18 or older</p>
                   </div>
                 </Label>
                 <Label
                   htmlFor='other'
-                  className='flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary'
+                  className='flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 border-blue-200 bg-white p-6 hover:bg-blue-50 hover:border-blue-400 transition-all [&:has([data-state=checked])]:border-blue-600 [&:has([data-state=checked])]:bg-blue-50'
                 >
                   <RadioGroupItem
                     value='other'
                     id='other'
                     className='sr-only'
                   />
-
+                  <Users className='h-12 w-12 text-blue-600 mb-4' />
                   <div className='text-center'>
-                    <p className='font-medium'>Someone else</p>
-                    <p className='text-sm text-muted-foreground'>
-                      Child or adult
+                    <p className='font-medium text-lg text-gray-800'>
+                      Someone else
                     </p>
+                    <p className='text-sm text-gray-600'>Child or adult</p>
                   </div>
                 </Label>
               </div>
@@ -364,18 +409,22 @@ export default function SymptomChecker() {
       case "symptoms":
         return (
           <div className='space-y-6'>
-            <h2 className='text-2xl font-bold'>Add your symptoms</h2>
+            <h2 className='text-3xl font-bold text-blue-600'>
+              Add your symptoms
+            </h2>
             <div className='relative'>
-              <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
+              <Search className='absolute left-2 top-2.5 h-4 w-4 text-gray-400' />
               <Input
                 placeholder='Search, e.g., headache'
-                className='pl-8'
+                className='pl-8 border-blue-200 focus:border-blue-400 focus:ring-blue-400'
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className='space-y-2'>
-              <h3 className='text-lg font-semibold'>Suggested symptoms:</h3>
+              <h3 className='text-xl font-semibold text-gray-800'>
+                Suggested symptoms:
+              </h3>
               <div className='flex flex-wrap gap-2'>
                 {predefinedSymptoms
                   .filter((symptom) =>
@@ -392,16 +441,18 @@ export default function SymptomChecker() {
                         }
                         setSearchTerm("");
                       }}
-                      className='flex items-center gap-1'
+                      className='flex items-center gap-1 border-blue-200 hover:bg-blue-50 hover:border-blue-400'
                     >
-                      <Plus className='h-4 w-4' />
+                      <Plus className='h-4 w-4 text-blue-600' />
                       {symptom}
                     </Button>
                   ))}
               </div>
             </div>
             <div className='space-y-2'>
-              <h3 className='text-lg font-semibold'>Selected symptoms:</h3>
+              <h3 className='text-xl font-semibold text-gray-800'>
+                Selected symptoms:
+              </h3>
               <div className='flex flex-wrap gap-2'>
                 {symptoms.map((symptom) => (
                   <Button
@@ -416,7 +467,7 @@ export default function SymptomChecker() {
                         return newDetails;
                       });
                     }}
-                    className='flex items-center gap-1'
+                    className='flex items-center gap-1 bg-blue-100 text-blue-800 hover:bg-blue-200'
                   >
                     {symptom}
                     <X className='h-4 w-4' />
@@ -425,7 +476,7 @@ export default function SymptomChecker() {
               </div>
             </div>
             {symptoms.length === 0 && (
-              <p className='text-sm text-muted-foreground'>
+              <p className='text-sm text-gray-500'>
                 Please add at least one symptom.
               </p>
             )}
@@ -435,14 +486,18 @@ export default function SymptomChecker() {
       case "symptomDetails":
         return (
           <div className='space-y-6'>
-            <h2 className='text-2xl font-bold'>
+            <h2 className='text-3xl font-bold text-blue-600'>
               Additional Symptom Information
             </h2>
             {symptoms.includes("Headache") && (
-              <div className='space-y-4'>
-                <h3 className='text-xl font-semibold'>Headache Details</h3>
+              <div className='space-y-4 bg-blue-50 p-6 rounded-lg'>
+                <h3 className='text-2xl font-semibold text-blue-800'>
+                  Headache Details
+                </h3>
                 <div className='space-y-2'>
-                  <h4 className='text-lg'>Duration</h4>
+                  <h4 className='text-lg font-medium text-gray-700'>
+                    Duration
+                  </h4>
                   <RadioGroup
                     value={symptomDetails.headache?.duration || ""}
                     onValueChange={(value) =>
@@ -461,7 +516,10 @@ export default function SymptomChecker() {
                           value={option}
                           id={`headache-duration-${option}`}
                         />
-                        <Label htmlFor={`headache-duration-${option}`}>
+                        <Label
+                          htmlFor={`headache-duration-${option}`}
+                          className='text-gray-700'
+                        >
                           {option.charAt(0).toUpperCase() + option.slice(1)}
                         </Label>
                       </div>
@@ -469,7 +527,9 @@ export default function SymptomChecker() {
                   </RadioGroup>
                 </div>
                 <div className='space-y-2'>
-                  <h4 className='text-lg'>Intensity</h4>
+                  <h4 className='text-lg font-medium text-gray-700'>
+                    Intensity
+                  </h4>
                   <RadioGroup
                     value={symptomDetails.headache?.intensity || ""}
                     onValueChange={(value) =>
@@ -488,7 +548,10 @@ export default function SymptomChecker() {
                           value={option}
                           id={`headache-intensity-${option}`}
                         />
-                        <Label htmlFor={`headache-intensity-${option}`}>
+                        <Label
+                          htmlFor={`headache-intensity-${option}`}
+                          className='text-gray-700'
+                        >
                           {option.charAt(0).toUpperCase() + option.slice(1)}
                         </Label>
                       </div>
@@ -498,10 +561,14 @@ export default function SymptomChecker() {
               </div>
             )}
             {symptoms.includes("Fever") && (
-              <div className='space-y-4'>
-                <h3 className='text-xl font-semibold'>Fever Details</h3>
+              <div className='space-y-4 bg-blue-50 p-6 rounded-lg'>
+                <h3 className='text-2xl font-semibold text-blue-800'>
+                  Fever Details
+                </h3>
                 <div className='space-y-2'>
-                  <h4 className='text-lg'>Temperature</h4>
+                  <h4 className='text-lg font-medium text-gray-700'>
+                    Temperature
+                  </h4>
                   <RadioGroup
                     value={symptomDetails.fever?.temperature || ""}
                     onValueChange={(value) =>
@@ -520,7 +587,10 @@ export default function SymptomChecker() {
                           value={option}
                           id={`fever-temperature-${option}`}
                         />
-                        <Label htmlFor={`fever-temperature-${option}`}>
+                        <Label
+                          htmlFor={`fever-temperature-${option}`}
+                          className='text-gray-700'
+                        >
                           {option.charAt(0).toUpperCase() + option.slice(1)}
                         </Label>
                       </div>
@@ -528,7 +598,9 @@ export default function SymptomChecker() {
                   </RadioGroup>
                 </div>
                 <div className='space-y-2'>
-                  <h4 className='text-lg'>Additional Symptoms</h4>
+                  <h4 className='text-lg font-medium text-gray-700'>
+                    Additional Symptoms
+                  </h4>
                   <div className='flex items-center space-x-2'>
                     <Checkbox
                       id='runny-nose'
@@ -543,7 +615,9 @@ export default function SymptomChecker() {
                         }))
                       }
                     />
-                    <Label htmlFor='runny-nose'>Runny Nose</Label>
+                    <Label htmlFor='runny-nose' className='text-gray-700'>
+                      Runny Nose
+                    </Label>
                   </div>
                   <div className='flex items-center space-x-2'>
                     <Checkbox
@@ -559,7 +633,9 @@ export default function SymptomChecker() {
                         }))
                       }
                     />
-                    <Label htmlFor='sore-throat'>Sore Throat</Label>
+                    <Label htmlFor='sore-throat' className='text-gray-700'>
+                      Sore Throat
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -570,7 +646,7 @@ export default function SymptomChecker() {
       case "care":
         return (
           <div className='space-y-6'>
-            <h2 className='text-2xl font-bold'>
+            <h2 className='text-3xl font-bold text-blue-600'>
               What kind of care are you planning to get right now?
             </h2>
             <RadioGroup
@@ -588,13 +664,13 @@ export default function SymptomChecker() {
               ].map((type) => (
                 <Label
                   key={type}
-                  className='flex cursor-pointer items-center justify-between rounded-lg border p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary'
+                  className='flex cursor-pointer items-center justify-between rounded-lg border border-blue-200 p-4 hover:bg-blue-50 hover:border-blue-400 transition-all [&:has([data-state=checked])]:border-blue-600 [&:has([data-state=checked])]:bg-blue-50'
                 >
                   <div className='flex items-center gap-2'>
                     <RadioGroupItem value={type} id={type} />
-                    <span>{type}</span>
+                    <span className='text-gray-800'>{type}</span>
                   </div>
-                  <Info className='h-4 w-4 text-muted-foreground' />
+                  <Info className='h-4 w-4 text-blue-600' />
                 </Label>
               ))}
             </RadioGroup>
@@ -607,9 +683,11 @@ export default function SymptomChecker() {
             <SymptomAnalysisResults results={results as any} />
             {userType === "hospital" && (
               <div className='space-y-4'>
-                <h3 className='text-xl font-semibold'>Assign Specialist</h3>
+                <h3 className='text-2xl font-semibold text-blue-600'>
+                  Assign Specialist
+                </h3>
                 <Select value={specialist || ""} onValueChange={setSpecialist}>
-                  <SelectTrigger>
+                  <SelectTrigger className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'>
                     <SelectValue placeholder='Select a specialist' />
                   </SelectTrigger>
                   <SelectContent>
@@ -625,6 +703,7 @@ export default function SymptomChecker() {
                     // Here you can add logic to save the assigned specialist
                     console.log("Assigned specialist:", specialist);
                   }}
+                  className='bg-blue-600 hover:bg-blue-700 text-white'
                 >
                   Assign Specialist
                 </Button>
@@ -719,39 +798,45 @@ export default function SymptomChecker() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8'>
-      <Card className='mx-auto max-w-2xl'>
-        <div className='p-6'>
-          {renderStep()}
-          <div className='mt-6 flex items-center justify-between'>
-            {step !== "welcome" && (
-              <Button variant='ghost' onClick={prevStep} className='gap-2'>
-                <ChevronLeft className='h-4 w-4' />
-                Back
-              </Button>
-            )}
-            {step !== "results" && (
-              <Button
-                className='ml-auto gap-2'
-                disabled={!canProceed() || isLoading}
-                onClick={nextStep}
-              >
-                {isLoading ? (
-                  <>
-                    <RefreshCw className='h-4 w-4 animate-spin' />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    Next
-                    <ChevronRight className='h-4 w-4' />
-                  </>
-                )}
-              </Button>
-            )}
+    <div className='min-h-screen bg-gradient-to-b from-blue-50 to-white'>
+      <div className='max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8'>
+        <div className='bg-white shadow-xl rounded-lg overflow-hidden'>
+          <div className='p-6 sm:p-10'>
+            {renderStep()}
+            <div className='mt-8 flex items-center justify-between'>
+              {step !== "welcome" && (
+                <Button
+                  variant='outline'
+                  onClick={prevStep}
+                  className='gap-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-400'
+                >
+                  <ChevronLeft className='h-4 w-4' />
+                  Back
+                </Button>
+              )}
+              {step !== "results" && (
+                <Button
+                  className='ml-auto gap-2 bg-blue-600 hover:bg-blue-700 text-white'
+                  disabled={!canProceed() || isLoading}
+                  onClick={nextStep}
+                >
+                  {isLoading ? (
+                    <>
+                      <RefreshCw className='h-4 w-4 animate-spin' />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      Next
+                      <ChevronRight className='h-4 w-4' />
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
