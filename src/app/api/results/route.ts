@@ -1,4 +1,4 @@
-import { FormStep } from "@/types/form";
+import { FormStep, UserType } from "@/types/form";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -6,7 +6,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const SYSTEM_PROMPT = `You are a medical symptom analysis assistant. Analyze the provided symptoms and medical history to provide structured medical information. 
+const SYSTEM_PROMPT = `You are a medical symptom analysis assistant. Analyze the provided symptoms, medical history, and user information to provide structured medical information. 
 DO NOT provide actual medical diagnosis - only provide possible conditions and recommendations for seeking appropriate medical care.
 Always encourage users to seek professional medical advice.
 Respond with a structured analysis following this format exactly:
@@ -19,6 +19,13 @@ Your response must be structured and factual.`;
 interface FormState {
   step: FormStep;
   acceptedTerms: boolean;
+  userType: UserType;
+  userDetails: {
+    name: string;
+    hospitalName?: string;
+    patientName?: string;
+    insurancePolicyNumber?: string;
+  };
   patientType: "self" | "other" | null;
   medicalHistory: {
     recentInjury: boolean | null;
@@ -29,6 +36,7 @@ interface FormState {
   };
   symptoms: string[];
   careType: string | null;
+  specialist: string | null;
 }
 
 export async function POST(req: Request) {
@@ -36,15 +44,18 @@ export async function POST(req: Request) {
     const formState: FormState = await req.json();
 
     // Extract relevant information from formState
+    const userType = formState.userType;
+    const userDetails = formState.userDetails;
     const patientType = formState.patientType;
     const medicalHistory = Object.entries(formState.medicalHistory)
       .filter(([_, value]) => value === true)
       .map(([key, _]) => key);
     const symptoms = formState.symptoms;
     const careType = formState.careType;
+    const specialist = formState.specialist;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4-turbo-preview",
       temperature: 0.2,
       messages: [
         {
@@ -57,14 +68,15 @@ export async function POST(req: Request) {
         {
           role: "user",
           content: `
+            User Type: ${userType}
+            User Details: ${JSON.stringify(userDetails)}
             Patient Type: ${patientType}
             Medical History: ${medicalHistory.join(", ")}
             Current Symptoms: ${symptoms.join(", ")}
             Preferred Care Type: ${careType}
+            Assigned Specialist: ${specialist}
             
             Provide a structured analysis of these symptoms and recommend appropriate medical care.
-
-
           `,
         },
       ],
@@ -72,15 +84,6 @@ export async function POST(req: Request) {
     });
 
     const analysis = JSON.parse(completion.choices[0].message.content!) as any;
-
-    // // Validate the response matches our expected schema
-    // if (
-    //   !analysis.recommendation ||
-    //   !analysis.possibleConditions ||
-    //   !analysis.carePlan
-    // ) {
-    //   throw new Error("Invalid response format from OpenAI");
-    // }
 
     console.log("Symptom analysis:", analysis);
 

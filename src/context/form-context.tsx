@@ -1,13 +1,19 @@
 "use client";
 
 import { createContext, useContext, useReducer, ReactNode } from "react";
-import { FormState, FormStep } from "@/types/form";
+import { FormState, FormStep, UserType } from "@/types/form";
+
+interface SymptomDetails {
+  [key: string]: any;
+}
 
 type FormAction =
   | { type: "NEXT_STEP" }
   | { type: "PREV_STEP" }
   | { type: "SET_STEP"; payload: FormStep }
   | { type: "SET_TERMS"; payload: boolean }
+  | { type: "SET_USER_TYPE"; payload: UserType }
+  | { type: "SET_USER_DETAILS"; payload: Partial<FormState["userDetails"]> }
   | { type: "SET_PATIENT_TYPE"; payload: "self" | "other" }
   | {
       type: "UPDATE_MEDICAL_HISTORY";
@@ -15,12 +21,21 @@ type FormAction =
     }
   | { type: "ADD_SYMPTOM"; payload: string }
   | { type: "REMOVE_SYMPTOM"; payload: string }
+  | { type: "SET_SYMPTOM_DETAILS"; payload: { [key: string]: any } }
   | { type: "SET_CARE_TYPE"; payload: string }
+  | { type: "SET_SPECIALIST"; payload: string }
   | { type: "RESET_FORM" };
 
 const initialState: FormState = {
   step: "welcome",
   acceptedTerms: false,
+  userType: null,
+  userDetails: {
+    name: "",
+    hospitalName: "",
+    patientName: "",
+    insurancePolicyNumber: "",
+  },
   patientType: null,
   medicalHistory: {
     recentInjury: null,
@@ -30,7 +45,9 @@ const initialState: FormState = {
     hypertension: null,
   },
   symptoms: [],
+  // symptomDetails: {},
   careType: null,
+  specialist: null,
 };
 
 const FormContext = createContext<{
@@ -38,15 +55,17 @@ const FormContext = createContext<{
   dispatch: React.Dispatch<FormAction>;
 } | null>(null);
 
-const formReducer = (state: FormState, action: FormAction): FormState => {
+const formReducer = (state: any, action: FormAction): FormState => {
   switch (action.type) {
     case "NEXT_STEP":
       const steps: FormStep[] = [
         "welcome",
         "terms",
+        "userType",
+        "userDetails",
         "patient",
-        "history",
         "symptoms",
+        "symptomDetails",
         "care",
         "results",
       ];
@@ -59,9 +78,11 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       const stepsBack: FormStep[] = [
         "welcome",
         "terms",
+        "userType",
+        "userDetails",
         "patient",
-        "history",
         "symptoms",
+        "symptomDetails",
         "care",
         "results",
       ];
@@ -79,6 +100,19 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       return {
         ...state,
         acceptedTerms: action.payload,
+      };
+    case "SET_USER_TYPE":
+      return {
+        ...state,
+        userType: action.payload,
+      };
+    case "SET_USER_DETAILS":
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          ...action.payload,
+        },
       };
     case "SET_PATIENT_TYPE":
       return {
@@ -102,13 +136,26 @@ const formReducer = (state: FormState, action: FormAction): FormState => {
       return {
         ...state,
         symptoms: state.symptoms.filter(
-          (symptom) => symptom !== action.payload
+          (symptom: any) => symptom !== action.payload
         ),
+      };
+    case "SET_SYMPTOM_DETAILS":
+      return {
+        ...state,
+        symptomDetails: {
+          ...state.symptomDetails,
+          ...action.payload,
+        },
       };
     case "SET_CARE_TYPE":
       return {
         ...state,
         careType: action.payload,
+      };
+    case "SET_SPECIALIST":
+      return {
+        ...state,
+        specialist: action.payload,
       };
     case "RESET_FORM":
       return initialState;

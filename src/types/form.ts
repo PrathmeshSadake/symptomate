@@ -1,16 +1,24 @@
 export type FormStep =
   | "welcome"
   | "terms"
+  | "userType"
+  | "userDetails"
   | "patient"
   | "symptoms"
   | "symptomDetails"
   | "care"
-  | "history"
   | "results";
 
 export interface FormState {
   step: FormStep;
   acceptedTerms: boolean;
+  userType: UserType | null;
+  userDetails: {
+    name: string;
+    hospitalName?: string;
+    patientName?: string;
+    insurancePolicyNumber?: string;
+  };
   patientType: "self" | "other" | null;
   medicalHistory: {
     recentInjury: boolean | null;
@@ -21,24 +29,27 @@ export interface FormState {
   };
   symptoms: string[];
   careType: string | null;
-}
-
-export interface SymptomResult {
-  specialist: string;
-  consultationType: string;
-  conditions: Array<{
-    name: string;
-    scientificName: string;
-    evidence: "high" | "moderate" | "low";
-    details?: string;
-  }>;
+  specialist: string | null;
 }
 
 export interface SymptomCheckerInput {
+  userType: UserType;
+  userDetails: FormState["userDetails"];
   patientType: string;
   medicalHistory: string[];
   symptoms: string[];
   careType: string;
+  specialist: string | null;
+}
+
+export interface SymptomCheckerInput {
+  userType: UserType;
+  userDetails: FormState["userDetails"];
+  patientType: string;
+  medicalHistory: string[];
+  symptoms: string[];
+  careType: string;
+  specialist: string | null;
 }
 
 export interface Condition {
@@ -73,3 +84,16 @@ export interface SymptomAnalysis {
     warningSymptoms: string[];
   };
 }
+
+export interface SymptomResult {
+  specialist: string;
+  consultationType: string;
+  conditions: Array<{
+    name: string;
+    scientificName: string;
+    evidence: "high" | "moderate" | "low";
+    details?: string;
+  }>;
+}
+
+export type UserType = "individual" | "hospital" | "insurance";

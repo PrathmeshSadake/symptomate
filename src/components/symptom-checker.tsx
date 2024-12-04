@@ -4,13 +4,17 @@ import { useAtom } from "jotai";
 import {
   stepAtom,
   acceptedTermsAtom,
+  userTypeAtom,
+  userDetailsAtom,
   patientTypeAtom,
   medicalHistoryAtom,
   symptomsAtom,
   careTypeAtom,
+  specialistAtom,
   resultsAtom,
   predefinedSymptomsAtom,
   symptomDetailsAtom,
+  predefinedSpecialistsAtom,
 } from "@/atoms/symptom-checker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,6 +22,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ChevronLeft,
   ChevronRight,
@@ -28,20 +39,23 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
-import { FormStep } from "@/types/form";
+import { FormStep, UserType } from "@/types/form";
 import { SymptomAnalysisResults } from "./results";
 
 export default function SymptomChecker() {
   const [step, setStep] = useAtom(stepAtom);
   const [acceptedTerms, setAcceptedTerms] = useAtom(acceptedTermsAtom);
+  const [userType, setUserType] = useAtom(userTypeAtom);
+  const [userDetails, setUserDetails] = useAtom(userDetailsAtom);
   const [patientType, setPatientType] = useAtom(patientTypeAtom);
   const [medicalHistory, setMedicalHistory] = useAtom(medicalHistoryAtom);
   const [symptoms, setSymptoms] = useAtom(symptomsAtom);
   const [careType, setCareType] = useAtom(careTypeAtom);
+  const [specialist, setSpecialist] = useAtom(specialistAtom);
   const [results, setResults] = useAtom(resultsAtom);
   const [predefinedSymptoms] = useAtom(predefinedSymptomsAtom);
+  const [predefinedSpecialists] = useAtom(predefinedSpecialistsAtom);
   const [symptomDetails, setSymptomDetails] = useAtom(symptomDetailsAtom);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -56,11 +70,14 @@ export default function SymptomChecker() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          userType,
+          userDetails,
           patientType,
           medicalHistory,
           symptoms,
           symptomDetails,
           careType,
+          specialist,
         }),
       });
       if (response.ok) {
@@ -75,146 +92,6 @@ export default function SymptomChecker() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  console.log(results);
-
-  const filteredSymptoms = predefinedSymptoms.filter((symptom) =>
-    symptom.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const addSymptom = (symptom: string) => {
-    if (!symptoms.includes(symptom)) {
-      setSymptoms([...symptoms, symptom]);
-    }
-    setSearchTerm("");
-  };
-
-  const removeSymptom = (symptom: string) => {
-    setSymptoms(symptoms.filter((s) => s !== symptom));
-    setSymptomDetails((prevDetails: any) => {
-      const newDetails = { ...prevDetails };
-      delete newDetails[symptom.toLowerCase() as keyof any];
-      return newDetails;
-    });
-  };
-
-  const updateSymptomDetails = (
-    symptom: keyof any,
-    key: string,
-    value: any
-  ) => {
-    setSymptomDetails((prevDetails: any) => ({
-      ...prevDetails,
-      [symptom]: {
-        ...prevDetails[symptom],
-        [key]: value,
-      },
-    }));
-  };
-
-  const renderSymptomDetailsStep = () => {
-    return (
-      <div className='space-y-6'>
-        <h2 className='text-2xl font-bold'>Additional Symptom Information</h2>
-        {symptoms.includes("Headache") && (
-          <div className='space-y-4'>
-            <h3 className='text-xl font-semibold'>Headache Details</h3>
-            <div className='space-y-2'>
-              <h4 className='text-lg'>Duration</h4>
-              <RadioGroup
-                value={symptomDetails.headache?.duration || ""}
-                onValueChange={(value) =>
-                  updateSymptomDetails("headache", "duration", value)
-                }
-              >
-                {["new", "recurring", "chronic"].map((option) => (
-                  <div key={option} className='flex items-center space-x-2'>
-                    <RadioGroupItem
-                      value={option}
-                      id={`headache-duration-${option}`}
-                    />
-                    <Label htmlFor={`headache-duration-${option}`}>
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-            <div className='space-y-2'>
-              <h4 className='text-lg'>Intensity</h4>
-              <RadioGroup
-                value={symptomDetails.headache?.intensity || ""}
-                onValueChange={(value) =>
-                  updateSymptomDetails("headache", "intensity", value)
-                }
-              >
-                {["mild", "moderate", "severe"].map((option) => (
-                  <div key={option} className='flex items-center space-x-2'>
-                    <RadioGroupItem
-                      value={option}
-                      id={`headache-intensity-${option}`}
-                    />
-                    <Label htmlFor={`headache-intensity-${option}`}>
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-          </div>
-        )}
-        {symptoms.includes("Fever") && (
-          <div className='space-y-4'>
-            <h3 className='text-xl font-semibold'>Fever Details</h3>
-            <div className='space-y-2'>
-              <h4 className='text-lg'>Temperature</h4>
-              <RadioGroup
-                value={symptomDetails.fever?.temperature || ""}
-                onValueChange={(value) =>
-                  updateSymptomDetails("fever", "temperature", value)
-                }
-              >
-                {["low", "moderate", "high"].map((option) => (
-                  <div key={option} className='flex items-center space-x-2'>
-                    <RadioGroupItem
-                      value={option}
-                      id={`fever-temperature-${option}`}
-                    />
-                    <Label htmlFor={`fever-temperature-${option}`}>
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-            <div className='space-y-2'>
-              <h4 className='text-lg'>Additional Symptoms</h4>
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='runny-nose'
-                  checked={symptomDetails.fever?.runnyNose || false}
-                  onCheckedChange={(checked) =>
-                    updateSymptomDetails("fever", "runnyNose", checked)
-                  }
-                />
-                <Label htmlFor='runny-nose'>Runny Nose</Label>
-              </div>
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='sore-throat'
-                  checked={symptomDetails.fever?.soreThroat || false}
-                  onCheckedChange={(checked) =>
-                    updateSymptomDetails("fever", "soreThroat", checked)
-                  }
-                />
-                <Label htmlFor='sore-throat'>Sore Throat</Label>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
   };
 
   const renderStep = () => {
@@ -299,8 +176,147 @@ export default function SymptomChecker() {
           </div>
         );
 
-      case "patient":
+      case "userType":
         return (
+          <div className='space-y-6'>
+            <h2 className='text-2xl font-bold'>Select User Type</h2>
+            <RadioGroup
+              value={userType || ""}
+              onValueChange={(value) => setUserType(value as UserType)}
+            >
+              <div className='grid gap-4 md:grid-cols-3'>
+                {["individual", "hospital", "insurance"].map((type) => (
+                  <Label
+                    key={type}
+                    htmlFor={type}
+                    className='flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary'
+                  >
+                    <RadioGroupItem
+                      value={type}
+                      id={type}
+                      className='sr-only'
+                    />
+                    <div className='text-center'>
+                      <p className='font-medium'>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </p>
+                    </div>
+                  </Label>
+                ))}
+              </div>
+            </RadioGroup>
+          </div>
+        );
+
+      case "userDetails":
+        return (
+          <div className='space-y-6'>
+            <h2 className='text-2xl font-bold'>User Details</h2>
+            {userType === "individual" && (
+              <div className='space-y-4'>
+                <Label htmlFor='name'>Name</Label>
+                <Input
+                  id='name'
+                  value={userDetails.name}
+                  onChange={(e) =>
+                    setUserDetails({ ...userDetails, name: e.target.value })
+                  }
+                />
+              </div>
+            )}
+            {userType === "hospital" && (
+              <div className='space-y-4'>
+                <div>
+                  <Label htmlFor='hospitalName'>Hospital Name</Label>
+                  <Input
+                    id='hospitalName'
+                    value={userDetails.hospitalName}
+                    onChange={(e) =>
+                      setUserDetails({
+                        ...userDetails,
+                        hospitalName: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor='patientName'>Patient Name</Label>
+                  <Input
+                    id='patientName'
+                    value={userDetails.patientName}
+                    onChange={(e) =>
+                      setUserDetails({
+                        ...userDetails,
+                        patientName: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor='specialist'>Specialist</Label>
+                  <Select
+                    value={specialist || ""}
+                    onValueChange={setSpecialist}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select a specialist' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {predefinedSpecialists.map((spec) => (
+                        <SelectItem key={spec} value={spec}>
+                          {spec}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+            {userType === "insurance" && (
+              <div className='space-y-4'>
+                <div>
+                  <Label htmlFor='insuranceName'>Insurance Company Name</Label>
+                  <Input
+                    id='insuranceName'
+                    value={userDetails.name}
+                    onChange={(e) =>
+                      setUserDetails({ ...userDetails, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor='patientName'>Patient Name</Label>
+                  <Input
+                    id='patientName'
+                    value={userDetails.patientName}
+                    onChange={(e) =>
+                      setUserDetails({
+                        ...userDetails,
+                        patientName: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor='policyNumber'>Insurance Policy Number</Label>
+                  <Input
+                    id='policyNumber'
+                    value={userDetails.insurancePolicyNumber}
+                    onChange={(e) =>
+                      setUserDetails({
+                        ...userDetails,
+                        insurancePolicyNumber: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case "patient":
+        return userType === "individual" ? (
           <div className='space-y-6'>
             <h2 className='text-2xl font-bold'>Who is the checkup for?</h2>
             <RadioGroup
@@ -343,7 +359,7 @@ export default function SymptomChecker() {
               </div>
             </RadioGroup>
           </div>
-        );
+        ) : null;
 
       case "symptoms":
         return (
@@ -361,18 +377,27 @@ export default function SymptomChecker() {
             <div className='space-y-2'>
               <h3 className='text-lg font-semibold'>Suggested symptoms:</h3>
               <div className='flex flex-wrap gap-2'>
-                {filteredSymptoms.map((symptom) => (
-                  <Button
-                    key={symptom}
-                    variant='outline'
-                    size='sm'
-                    onClick={() => addSymptom(symptom)}
-                    className='flex items-center gap-1'
-                  >
-                    <Plus className='h-4 w-4' />
-                    {symptom}
-                  </Button>
-                ))}
+                {predefinedSymptoms
+                  .filter((symptom) =>
+                    symptom.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map((symptom) => (
+                    <Button
+                      key={symptom}
+                      variant='outline'
+                      size='sm'
+                      onClick={() => {
+                        if (!symptoms.includes(symptom)) {
+                          setSymptoms([...symptoms, symptom]);
+                        }
+                        setSearchTerm("");
+                      }}
+                      className='flex items-center gap-1'
+                    >
+                      <Plus className='h-4 w-4' />
+                      {symptom}
+                    </Button>
+                  ))}
               </div>
             </div>
             <div className='space-y-2'>
@@ -383,7 +408,14 @@ export default function SymptomChecker() {
                     key={symptom}
                     variant='secondary'
                     size='sm'
-                    onClick={() => removeSymptom(symptom)}
+                    onClick={() => {
+                      setSymptoms(symptoms.filter((s) => s !== symptom));
+                      setSymptomDetails((prevDetails: any) => {
+                        const newDetails = { ...prevDetails };
+                        delete newDetails[symptom.toLowerCase() as keyof any];
+                        return newDetails;
+                      });
+                    }}
                     className='flex items-center gap-1'
                   >
                     {symptom}
@@ -401,7 +433,139 @@ export default function SymptomChecker() {
         );
 
       case "symptomDetails":
-        return renderSymptomDetailsStep();
+        return (
+          <div className='space-y-6'>
+            <h2 className='text-2xl font-bold'>
+              Additional Symptom Information
+            </h2>
+            {symptoms.includes("Headache") && (
+              <div className='space-y-4'>
+                <h3 className='text-xl font-semibold'>Headache Details</h3>
+                <div className='space-y-2'>
+                  <h4 className='text-lg'>Duration</h4>
+                  <RadioGroup
+                    value={symptomDetails.headache?.duration || ""}
+                    onValueChange={(value) =>
+                      setSymptomDetails((prevDetails: any) => ({
+                        ...prevDetails,
+                        headache: {
+                          ...prevDetails.headache,
+                          duration: value,
+                        },
+                      }))
+                    }
+                  >
+                    {["new", "recurring", "chronic"].map((option) => (
+                      <div key={option} className='flex items-center space-x-2'>
+                        <RadioGroupItem
+                          value={option}
+                          id={`headache-duration-${option}`}
+                        />
+                        <Label htmlFor={`headache-duration-${option}`}>
+                          {option.charAt(0).toUpperCase() + option.slice(1)}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+                <div className='space-y-2'>
+                  <h4 className='text-lg'>Intensity</h4>
+                  <RadioGroup
+                    value={symptomDetails.headache?.intensity || ""}
+                    onValueChange={(value) =>
+                      setSymptomDetails((prevDetails: any) => ({
+                        ...prevDetails,
+                        headache: {
+                          ...prevDetails.headache,
+                          intensity: value,
+                        },
+                      }))
+                    }
+                  >
+                    {["mild", "moderate", "severe"].map((option) => (
+                      <div key={option} className='flex items-center space-x-2'>
+                        <RadioGroupItem
+                          value={option}
+                          id={`headache-intensity-${option}`}
+                        />
+                        <Label htmlFor={`headache-intensity-${option}`}>
+                          {option.charAt(0).toUpperCase() + option.slice(1)}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+              </div>
+            )}
+            {symptoms.includes("Fever") && (
+              <div className='space-y-4'>
+                <h3 className='text-xl font-semibold'>Fever Details</h3>
+                <div className='space-y-2'>
+                  <h4 className='text-lg'>Temperature</h4>
+                  <RadioGroup
+                    value={symptomDetails.fever?.temperature || ""}
+                    onValueChange={(value) =>
+                      setSymptomDetails((prevDetails: any) => ({
+                        ...prevDetails,
+                        fever: {
+                          ...prevDetails.fever,
+                          temperature: value,
+                        },
+                      }))
+                    }
+                  >
+                    {["low", "moderate", "high"].map((option) => (
+                      <div key={option} className='flex items-center space-x-2'>
+                        <RadioGroupItem
+                          value={option}
+                          id={`fever-temperature-${option}`}
+                        />
+                        <Label htmlFor={`fever-temperature-${option}`}>
+                          {option.charAt(0).toUpperCase() + option.slice(1)}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+                <div className='space-y-2'>
+                  <h4 className='text-lg'>Additional Symptoms</h4>
+                  <div className='flex items-center space-x-2'>
+                    <Checkbox
+                      id='runny-nose'
+                      checked={symptomDetails.fever?.runnyNose || false}
+                      onCheckedChange={(checked) =>
+                        setSymptomDetails((prevDetails: any) => ({
+                          ...prevDetails,
+                          fever: {
+                            ...prevDetails.fever,
+                            runnyNose: checked,
+                          },
+                        }))
+                      }
+                    />
+                    <Label htmlFor='runny-nose'>Runny Nose</Label>
+                  </div>
+                  <div className='flex items-center space-x-2'>
+                    <Checkbox
+                      id='sore-throat'
+                      checked={symptomDetails.fever?.soreThroat || false}
+                      onCheckedChange={(checked) =>
+                        setSymptomDetails((prevDetails: any) => ({
+                          ...prevDetails,
+                          fever: {
+                            ...prevDetails.fever,
+                            soreThroat: checked,
+                          },
+                        }))
+                      }
+                    />
+                    <Label htmlFor='sore-throat'>Sore Throat</Label>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
 
       case "care":
         return (
@@ -439,7 +603,34 @@ export default function SymptomChecker() {
 
       case "results":
         return results ? (
-          <SymptomAnalysisResults results={results as any} />
+          <div className='space-y-6'>
+            <SymptomAnalysisResults results={results as any} />
+            {userType === "hospital" && (
+              <div className='space-y-4'>
+                <h3 className='text-xl font-semibold'>Assign Specialist</h3>
+                <Select value={specialist || ""} onValueChange={setSpecialist}>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select a specialist' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {predefinedSpecialists.map((spec) => (
+                      <SelectItem key={spec} value={spec}>
+                        {spec}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={() => {
+                    // Here you can add logic to save the assigned specialist
+                    console.log("Assigned specialist:", specialist);
+                  }}
+                >
+                  Assign Specialist
+                </Button>
+              </div>
+            )}
+          </div>
         ) : null;
 
       default:
@@ -451,12 +642,29 @@ export default function SymptomChecker() {
     switch (step) {
       case "terms":
         return acceptedTerms;
+      case "userType":
+        return userType !== null;
+      case "userDetails":
+        if (userType === "individual") return userDetails.name.trim() !== "";
+        if (userType === "hospital")
+          return (
+            userDetails.hospitalName?.trim() !== "" &&
+            userDetails.patientName?.trim() !== "" &&
+            specialist !== null
+          );
+        if (userType === "insurance")
+          return (
+            userDetails.name.trim() !== "" &&
+            userDetails.patientName?.trim() !== "" &&
+            userDetails.insurancePolicyNumber?.trim() !== ""
+          );
+        return false;
       case "patient":
-        return patientType !== null;
+        return userType === "individual" ? patientType !== null : true;
       case "symptoms":
         return symptoms.length > 0;
       case "symptomDetails":
-        return true; // Always allow proceeding from symptom details
+        return true;
       case "care":
         return careType !== null;
       default:
@@ -468,6 +676,8 @@ export default function SymptomChecker() {
     const steps: FormStep[] = [
       "welcome",
       "terms",
+      "userType",
+      "userDetails",
       "patient",
       "symptoms",
       "symptomDetails",
@@ -476,7 +686,9 @@ export default function SymptomChecker() {
     ];
     const currentIndex = steps.indexOf(step);
 
-    if (step === "symptoms" && symptoms.length > 0) {
+    if (step === "userDetails" && userType !== "individual") {
+      setStep("symptoms");
+    } else if (step === "symptoms" && symptoms.length > 0) {
       setStep("symptomDetails");
     } else if (step === "care") {
       handleSubmit();
@@ -489,6 +701,8 @@ export default function SymptomChecker() {
     const steps: FormStep[] = [
       "welcome",
       "terms",
+      "userType",
+      "userDetails",
       "patient",
       "symptoms",
       "symptomDetails",
@@ -496,7 +710,12 @@ export default function SymptomChecker() {
       "results",
     ];
     const currentIndex = steps.indexOf(step);
-    setStep(steps[currentIndex - 1]);
+
+    if (step === "symptoms" && userType !== "individual") {
+      setStep("userDetails");
+    } else {
+      setStep(steps[currentIndex - 1]);
+    }
   };
 
   return (
