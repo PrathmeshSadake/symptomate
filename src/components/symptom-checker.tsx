@@ -78,7 +78,6 @@ export default function SymptomChecker() {
           patientType,
           medicalHistory,
           symptoms,
-
           careType,
           specialist,
         }),
@@ -290,7 +289,10 @@ export default function SymptomChecker() {
                   </Label>
                   <Select
                     value={specialist || ""}
-                    onValueChange={setSpecialist}
+                    onValueChange={(value) => {
+                      setSpecialist(value);
+                      setSymptoms([]); // Clear existing symptoms when specialist changes
+                    }}
                   >
                     <SelectTrigger className='border-blue-200 focus:border-blue-400 focus:ring-blue-400'>
                       <SelectValue placeholder='Select a specialist' />
@@ -424,7 +426,10 @@ export default function SymptomChecker() {
                 Suggested symptoms:
               </h3>
               <div className='flex flex-wrap gap-2'>
-                {predefinedSymptoms
+                {(userType === "hospital" && specialist
+                  ? predefinedSymptoms[specialist] || predefinedSymptoms.basic
+                  : predefinedSymptoms.basic
+                )
                   .filter((symptom) =>
                     symptom.toLowerCase().includes(searchTerm.toLowerCase())
                   )
@@ -590,7 +595,6 @@ export default function SymptomChecker() {
       "userDetails",
       "patient",
       "symptoms",
-
       "care",
       "results",
     ];
@@ -613,7 +617,6 @@ export default function SymptomChecker() {
       "userDetails",
       "patient",
       "symptoms",
-
       "care",
       "results",
     ];
